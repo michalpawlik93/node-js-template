@@ -1,19 +1,4 @@
 services:
-  postgres:
-    image: postgres:16
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-app}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-    volumes:
-      - postgres_prod_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
   migrate:
     build:
       context: ../..
@@ -21,19 +6,26 @@ services:
       target: build
     environment:
       NODE_ENV: production
-      DATABASE_URL_CORE: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@postgres:5432/${POSTGRES_DB:-app}?schema=core
-      DATABASE_URL_PRODUCTS: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@postgres:5432/${POSTGRES_DB:-app}?schema=products
-    depends_on:
-      postgres:
-        condition: service_healthy
+      DATABASE_URL_CORE: ${DATABASE_URL_CORE}
+      DIRECT_URL_CORE: ${DIRECT_URL_CORE}
+      DATABASE_URL_PRODUCTS: ${DATABASE_URL_PRODUCTS}
+      DIRECT_URL_PRODUCTS: ${DIRECT_URL_PRODUCTS}
+      DATABASE_URL_IDENTITY: ${DATABASE_URL_IDENTITY}
+      DIRECT_URL_IDENTITY: ${DIRECT_URL_IDENTITY}
     command:
       - /bin/sh
       - -lc
       - |
-        printf 'CREATE SCHEMA IF NOT EXISTS "core";' | npx prisma db execute --stdin --schema libs/core/src/providers/prisma/schema.prisma
-        printf 'CREATE SCHEMA IF NOT EXISTS "products";' | npx prisma db execute --stdin --schema libs/products/src/infrastructure/prisma/schema.prisma
+        set -e
+        CORE_DB_BASE="$${DIRECT_URL_CORE%%\?*}"
+        PRODUCTS_DB_BASE="$${DIRECT_URL_PRODUCTS%%\?*}"
+        IDENTITY_DB_BASE="$${DIRECT_URL_IDENTITY%%\?*}"
+        psql "$$CORE_DB_BASE" -v ON_ERROR_STOP=1 -c 'CREATE SCHEMA IF NOT EXISTS "core";'
+        psql "$$PRODUCTS_DB_BASE" -v ON_ERROR_STOP=1 -c 'CREATE SCHEMA IF NOT EXISTS "products";'
+        psql "$$IDENTITY_DB_BASE" -v ON_ERROR_STOP=1 -c 'CREATE SCHEMA IF NOT EXISTS "identity";'
         npx prisma migrate deploy --schema libs/core/src/providers/prisma/schema.prisma
         npx prisma migrate deploy --schema libs/products/src/infrastructure/prisma/schema.prisma
+        npx prisma migrate deploy --schema libs/identity/src/infrastructure/prisma/schema.prisma
     restart: 'no'
 
   app:
@@ -42,17 +34,22 @@ services:
       context: ../..
       dockerfile: Dockerfile
       target: runtime
-    restart: unless-stopped
+    restart: "no"
     environment:
       NODE_ENV: production
-      DATABASE_URL_CORE: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@postgres:5432/${POSTGRES_DB:-app}?schema=core
-      DATABASE_URL_PRODUCTS: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@postgres:5432/${POSTGRES_DB:-app}?schema=products
+      DATABASE_URL_CORE: ${DATABASE_URL_CORE}
+      DIRECT_URL_CORE: ${DIRECT_URL_CORE}
+      DATABASE_URL_PRODUCTS: ${DATABASE_URL_PRODUCTS}
+      DIRECT_URL_PRODUCTS: ${DIRECT_URL_PRODUCTS}
+      DATABASE_URL_IDENTITY: ${DATABASE_URL_IDENTITY}
+      DIRECT_URL_IDENTITY: ${DIRECT_URL_IDENTITY}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
       CORE_LOG_FILE_PATH: /tmp/core.log
       PRODUCTS_LOG_FILE_PATH: /tmp/products.log
+      IDENTITY_LOG_FILE_PATH: /tmp/identity.log
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
       migrate:
         condition: service_completed_successfully
-
-volumes:
-  postgres_prod_data:

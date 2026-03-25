@@ -17,7 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@app/app-console": ["apps/app-console/src/main.ts"],
-      "@app/identity": ["libs/identity/src/main.ts"],
+      "@app/identity": ["libs/identity/src/index.ts"],
       "@app/integration-contracts": ["libs/integration-contracts/src/index.ts"],
       "@app/products": ["libs/products/src/index.ts"],
       "@app/core/prisma": ["libs/core/src/providers/prisma/index.ts"],

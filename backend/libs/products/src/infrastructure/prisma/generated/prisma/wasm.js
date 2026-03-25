@@ -126,7 +126,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Projects\\modular-monolith-template\\nodeJs\\libs\\products\\src\\infrastructure\\prisma\\generated\\prisma",
+      "value": "E:\\Nauka\\node-js-template\\backend\\libs\\products\\src\\infrastructure\\prisma\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -140,7 +140,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Projects\\modular-monolith-template\\nodeJs\\libs\\products\\src\\infrastructure\\prisma\\schema.prisma",
+    "sourceFilePath": "E:\\Nauka\\node-js-template\\backend\\libs\\products\\src\\infrastructure\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -162,8 +162,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL_PRODUCTS\")\n}\n\nmodel Product {\n  id         String   @id @default(cuid())\n  name       String\n  priceCents Int\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n}\n",
-  "inlineSchemaHash": "368a4c6f9f6dfd33321b9a626fc534ffe5cc8c6e4a32bf4ea99bddd96a2599a7",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL_PRODUCTS\")\n  directUrl = env(\"DIRECT_URL_PRODUCTS\")\n}\n\nmodel Product {\n  id         String   @id @default(cuid())\n  name       String\n  priceCents Int\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n}\n",
+  "inlineSchemaHash": "d2b308d8d5c969f277aee1508713767ad27535d1c72e8470e32f81e0f1ee966d",
   "copyEngine": true
 }
 config.dirname = '/'

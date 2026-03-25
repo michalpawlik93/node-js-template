@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "@prisma/client": "^6.2.1",
+    "@supabase/supabase-js": "^2.57.4",
     "tslib": "^2.3.0"
   },
   "type": "commonjs",

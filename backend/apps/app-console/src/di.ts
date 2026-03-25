@@ -15,14 +15,23 @@ import {
   disconnectProductsInfrastructure,
 } from '@app/products';
 import {
+  buildIdentityPrismaConfig,
+  createIdentityModuleContainer,
+  connectIdentityInfrastructure,
+  disconnectIdentityInfrastructure,
+} from '@app/identity';
+import {
   buildProductsLoggerConfig,
   buildCoreLoggerConfig,
+  buildIdentityLoggerConfig,
+  buildSupabaseConfig,
 } from './config';
 
 export interface SetupResult {
   modules: {
     core: ModuleContainer;
     products: ModuleContainer;
+    identity: ModuleContainer;
   };
   requestContext: RequestContext;
 }
@@ -48,6 +57,19 @@ export async function setupContainer(): Promise<SetupResult> {
     'products.infrastructure',
   );
 
+  const identityContainer = createIdentityModuleContainer({
+    logger: buildIdentityLoggerConfig(),
+    prisma: buildIdentityPrismaConfig(),
+    supabase: buildSupabaseConfig(),
+    coreContainer,
+    requestContext,
+  });
+  const identityLoggerFactory =
+    identityContainer.get<LoggerFactory>(LOGGING_TYPES.LoggerFactory);
+  const identityLogger = identityLoggerFactory.forScope(
+    'identity.infrastructure',
+  );
+
   const modules: SetupResult['modules'] = {
     core: {
       name: 'core',
@@ -63,6 +85,14 @@ export async function setupContainer(): Promise<SetupResult> {
         connectProductsInfrastructure(productsContainer, productsLogger),
       disconnect: () =>
         disconnectProductsInfrastructure(productsContainer, productsLogger),
+    },
+    identity: {
+      name: 'identity',
+      container: identityContainer,
+      connect: () =>
+        connectIdentityInfrastructure(identityContainer, identityLogger),
+      disconnect: () =>
+        disconnectIdentityInfrastructure(identityContainer, identityLogger),
     },
   };
   return { modules, requestContext };

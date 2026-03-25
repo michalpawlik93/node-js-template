@@ -14,5 +14,8 @@
     "src/**/__tests__/**/*",
     "src/**/__fixtures__/**/*"
   ],
-  "references": [{ "path": "../core/tsconfig.lib.json" }]
+  "references": [
+    { "path": "../core/tsconfig.lib.json" },
+    { "path": "../integration-contracts/tsconfig.lib.json" }
+  ]
 }

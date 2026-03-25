@@ -108,7 +108,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Projects\\modular-monolith-template\\nodeJs\\libs\\core\\src\\providers\\prisma\\generated\\prisma",
+      "value": "E:\\Nauka\\node-js-template\\backend\\libs\\core\\src\\providers\\prisma\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -122,7 +122,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Projects\\modular-monolith-template\\nodeJs\\libs\\core\\src\\providers\\prisma\\schema.prisma",
+    "sourceFilePath": "E:\\Nauka\\node-js-template\\backend\\libs\\core\\src\\providers\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -144,8 +144,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL_CORE\")\n}\n",
-  "inlineSchemaHash": "52475cbe9f54710ed3824d04a5c72a2d746297e1bf4dcc43e980ca1ae95617c2",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL_CORE\")\n  directUrl = env(\"DIRECT_URL_CORE\")\n}\n",
+  "inlineSchemaHash": "aff5e04bd41d3907fd0fd3a3267495be9b56a19c9125dad0bb7f3a8603672fa4",
   "copyEngine": true
 }
 config.dirname = '/'

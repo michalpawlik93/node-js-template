@@ -2,7 +2,7 @@ FROM node:22-slim AS deps
 WORKDIR /workspace
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends openssl \
+  && apt-get install -y --no-install-recommends openssl postgresql-client \
   && rm -rf /var/lib/apt/lists/*
 
 COPY package.json package-lock.json ./
@@ -10,14 +10,20 @@ RUN npm ci
 
 FROM deps AS generate
 WORKDIR /workspace
-ENV DATABASE_URL_CORE=postgresql://app:app@localhost:5432/app?schema=core
-ENV DATABASE_URL_PRODUCTS=postgresql://app:app@localhost:5432/app?schema=products
+ENV DATABASE_URL_CORE=postgresql://postgres:postgres@127.0.0.1:54322/postgres?schema=core
+ENV DIRECT_URL_CORE=postgresql://postgres:postgres@127.0.0.1:54322/postgres?schema=core
+ENV DATABASE_URL_PRODUCTS=postgresql://postgres:postgres@127.0.0.1:54322/postgres?schema=products
+ENV DIRECT_URL_PRODUCTS=postgresql://postgres:postgres@127.0.0.1:54322/postgres?schema=products
+ENV DATABASE_URL_IDENTITY=postgresql://postgres:postgres@127.0.0.1:54322/postgres?schema=identity
+ENV DIRECT_URL_IDENTITY=postgresql://postgres:postgres@127.0.0.1:54322/postgres?schema=identity
 
 COPY libs/core/src/providers/prisma/schema.prisma libs/core/src/providers/prisma/schema.prisma
 COPY libs/products/src/infrastructure/prisma/schema.prisma libs/products/src/infrastructure/prisma/schema.prisma
+COPY libs/identity/src/infrastructure/prisma/schema.prisma libs/identity/src/infrastructure/prisma/schema.prisma
 
 RUN npx prisma generate --schema libs/core/src/providers/prisma/schema.prisma \
-  && npx prisma generate --schema libs/products/src/infrastructure/prisma/schema.prisma
+  && npx prisma generate --schema libs/products/src/infrastructure/prisma/schema.prisma \
+  && npx prisma generate --schema libs/identity/src/infrastructure/prisma/schema.prisma
 
 FROM deps AS build
 WORKDIR /workspace
@@ -25,6 +31,7 @@ WORKDIR /workspace
 COPY . .
 COPY --from=generate /workspace/libs/core/src/providers/prisma/generated /workspace/libs/core/src/providers/prisma/generated
 COPY --from=generate /workspace/libs/products/src/infrastructure/prisma/generated /workspace/libs/products/src/infrastructure/prisma/generated
+COPY --from=generate /workspace/libs/identity/src/infrastructure/prisma/generated /workspace/libs/identity/src/infrastructure/prisma/generated
 
 RUN npx nx build app-console --configuration=production
 
@@ -46,6 +53,7 @@ COPY --from=build /workspace/dist/apps/app-console/main.js ./main.js
 COPY --from=build /workspace/apps/app-console/config ./apps/app-console/config
 COPY --from=generate /workspace/libs/core/src/providers/prisma/generated/prisma ./libs/core/src/providers/prisma/generated/prisma
 COPY --from=generate /workspace/libs/products/src/infrastructure/prisma/generated/prisma ./libs/products/src/infrastructure/prisma/generated/prisma
+COPY --from=generate /workspace/libs/identity/src/infrastructure/prisma/generated/prisma ./libs/identity/src/infrastructure/prisma/generated/prisma
 
 RUN mkdir -p /app/logs/app-console \
   && chown -R node:node /app

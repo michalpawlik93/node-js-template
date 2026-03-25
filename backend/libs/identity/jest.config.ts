@@ -10,6 +10,7 @@ export default {
     '^@app/identity$': '<rootDir>/src/index.ts',
     '^@app/core$': '<rootDir>/../../libs/core/src/index.ts',
     '^@app/core/prisma$': '<rootDir>/../../libs/core/src/providers/prisma/index.ts',
+    '^@app/integration-contracts$': '<rootDir>/../../libs/integration-contracts/src/index.ts',
   },
   moduleFileExtensions: ['ts', 'js'],
   coverageDirectory: '../../coverage/libs/identity',

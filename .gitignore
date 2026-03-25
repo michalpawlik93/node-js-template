@@ -53,3 +53,9 @@ nodeJs/.nx/workspace-data
 logs
 
 */iac/docker/data
+
+# production secrets
+iac/docker/.env
+
+# Supabase CLI local cache
+backend/supabase/

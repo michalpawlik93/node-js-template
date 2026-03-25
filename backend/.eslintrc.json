@@ -32,7 +32,7 @@
               },
               {
                 "sourceTag": "scope:domain-*",
-                "onlyDependOnLibsWithTags": ["scope:core"]
+                "onlyDependOnLibsWithTags": ["scope:core", "scope:integration-contracts"]
               },
               {
                 "sourceTag": "scope:core",

@@ -43,12 +43,13 @@ export interface ModuleContainer {
   disconnect: () => Promise<void>;
 }
 
-export type ModuleContainerName = 'core' | 'products';
+export type ModuleContainerName = 'core' | 'products' | 'identity';
 
 export interface SetupResult {
   modules: {
     core: ModuleContainer;
     products: ModuleContainer;
+    identity: ModuleContainer;
   };
   requestContext: RequestContext;
   appContainer?: Container;
