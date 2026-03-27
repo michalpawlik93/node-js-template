@@ -1,0 +1,27 @@
+{
+  "app": {
+    "title": "Control Panel"
+  },
+  "nav": {
+    "products": "Products"
+  },
+  "auth": {
+    "title": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "login": "Login",
+    "logout": "Logout",
+    "requiredEmail": "Email is required",
+    "requiredPassword": "Password is required",
+    "invalidEmail": "Invalid email format"
+  },
+  "products": {
+    "title": "Products",
+    "name": "Name",
+    "priceCents": "Price (cents)",
+    "create": "Create product",
+    "reset": "Reset",
+    "delete": "Delete",
+    "empty": "No products available."
+  }
+}

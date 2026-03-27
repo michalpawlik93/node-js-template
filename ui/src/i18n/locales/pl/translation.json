@@ -1,0 +1,27 @@
+{
+  "app": {
+    "title": "Panel zarzadzania"
+  },
+  "nav": {
+    "products": "Produkty"
+  },
+  "auth": {
+    "title": "Logowanie",
+    "email": "Email",
+    "password": "Haslo",
+    "login": "Zaloguj",
+    "logout": "Wyloguj",
+    "requiredEmail": "Email jest wymagany",
+    "requiredPassword": "Haslo jest wymagane",
+    "invalidEmail": "Niepoprawny format email"
+  },
+  "products": {
+    "title": "Produkty",
+    "name": "Nazwa",
+    "priceCents": "Cena (grosze)",
+    "create": "Dodaj produkt",
+    "reset": "Wyczysc",
+    "delete": "Usun",
+    "empty": "Brak produktow."
+  }
+}
