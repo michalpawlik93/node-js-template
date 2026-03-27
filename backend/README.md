@@ -2,21 +2,21 @@
 
 ## 🚀 Quick Start
 
-Wszystkie komendy uruchamiaj z katalogu `backend`.
+Run all commands from the `backend` directory.
 
-### Pierwsze uruchomienie (setup)
+### First-time setup
 
 ```powershell
 make setup
 ```
 
-### Uruchomienie aplikacji
+### Start the application
 
 ```powershell
 make serve
 ```
 
-### Zatrzymanie środowiska
+### Stop the environment
 
 ```powershell
 make supabase-down
@@ -24,41 +24,41 @@ make supabase-down
 
 ---
 
-## 📋 Szczegóły
+## 📋 Details
 
-### Co robi `make setup`?
+### What does `make setup` do?
 
-Automatycznie konfiguruje całe środowisko lokalne:
+Automatically configures the entire local environment:
 
-1. **Instaluje zależności** - `npm ci`
-2. **Uruchamia Supabase** - lokalna baza Postgres + Auth + Studio
-3. **Czeka na bazę** - healthcheck na porcie `54322`
-4. **Tworzy schematy** - `core`, `products`, `identity`
-5. **Migracje Prisma** - aktualizuje strukturę bazy
-6. **Generuje klienty** - Prisma Client dla wszystkich modułów
+1. **Installs dependencies** — `npm ci`
+2. **Starts Supabase** — local Postgres + Auth + Studio in Docker
+3. **Waits for the database** — healthcheck on port `54322`
+4. **Creates schemas** — `core`, `products`, `identity`
+5. **Runs Prisma migrations** — applies schema changes to the database
+6. **Generates Prisma clients** — for all modules
 
-Supabase uruchamia się w Docker i jest dostępny pod:
+Supabase runs in Docker and is available at:
 - **Postgres**: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
 - **Studio** (dashboard): http://127.0.0.1:54323
 - **Auth API**: http://127.0.0.1:54321
 
-### Dostępne komendy
+### Available commands
 
-| Komenda | Co robi |
-|---------|---------|
-| `make setup` | Pełna konfiguracja od zera |
-| `make serve` | Uruchamia aplikację |
-| `make supabase-up` | Uruchamia Supabase (bez reinstalacji) |
-| `make supabase-down` | Zatrzymuje Supabase |
-| `make schemas` | Tworzy schematy w bazie |
-| `make migrate` | Uruchamia migracje Prisma |
-| `make generate` | Generuje klienty Prisma |
-| `make test` | Uruchamia testy |
-| `make build` | Buduje produkcyjne artefakty |
+| Command | Description |
+|---------|-------------|
+| `make setup` | Full setup from scratch |
+| `make serve` | Start the application |
+| `make supabase-up` | Start Supabase (without reinstalling) |
+| `make supabase-down` | Stop Supabase |
+| `make schemas` | Create database schemas |
+| `make migrate` | Run Prisma migrations |
+| `make generate` | Generate Prisma clients |
+| `make test` | Run tests |
+| `make build` | Build production artifacts |
 
-### Tworzenie migracji Prisma
+### Creating Prisma migrations
 
-Gdy zmieniasz model w `schema.prisma`, utwórz migrację:
+When you change a model in `schema.prisma`, create a migration:
 
 ```powershell
 make migration-create SCHEMA=core NAME=add_audit_columns
@@ -68,17 +68,17 @@ make migration-create SCHEMA=identity NAME=add_user_roles
 
 ### Troubleshooting
 
-**Supabase nie startuje** → sprawdź czy Docker Desktop działa  
-**Port 54322 zajęty** → zatrzymaj inne instancje Postgres  
-**Błąd migracji** → sprawdź czy `make schemas` zostało wykonane  
+**Supabase won't start** → check that Docker Desktop is running  
+**Port 54322 in use** → stop other Postgres instances  
+**Migration error** → make sure `make schemas` has been run first  
 
 ---
 
-## 🐳 Deploy Produkcyjny (Docker)
+## 🐳 Production Deploy (Docker)
 
-### Konfiguracja zmiennych środowiskowych
+### Environment variables
 
-Utwórz plik `iac/docker/.env` z wartościami Supabase Cloud:
+Create `iac/docker/.env` with your Supabase Cloud credentials:
 
 ```env
 DATABASE_URL_CORE=postgresql://postgres.gqtspfhjwnzvpysjpkvf:YOUR_PASSWORD@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&schema=core
@@ -88,31 +88,31 @@ DIRECT_URL_PRODUCTS=postgresql://postgres.gqtspfhjwnzvpysjpkvf:YOUR_PASSWORD@aws
 DATABASE_URL_IDENTITY=postgresql://postgres.gqtspfhjwnzvpysjpkvf:YOUR_PASSWORD@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&schema=identity
 DIRECT_URL_IDENTITY=postgresql://postgres.gqtspfhjwnzvpysjpkvf:YOUR_PASSWORD@aws-1-eu-west-1.pooler.supabase.com:5432/postgres?schema=identity
 SUPABASE_URL=https://gqtspfhjwnzvpysjpkvf.supabase.co
-SUPABASE_PUBLISHABLE_KEY=<z-dashboard>
-SUPABASE_SERVICE_ROLE_KEY=<z-dashboard>
+SUPABASE_PUBLISHABLE_KEY=<from-dashboard>
+SUPABASE_SERVICE_ROLE_KEY=<from-dashboard>
 LOG_LEVEL=info
 ```
 
-**Wyjaśnienie portów:**
-- **6543** - connection pooler (Supavisor) - do normalnych zapytań (`DATABASE_URL_*`)
-- **5432** - direct connection - do migracji (`DIRECT_URL_*`)
+**Port explanation:**
+- **6543** — Supavisor connection pooler — for regular queries (`DATABASE_URL_*`)
+- **5432** — direct connection — for migrations only (`DIRECT_URL_*`)
 
 ### Deploy
 
 ```powershell
-# Build obrazu Docker
+# Build Docker image
 make docker-build
 
-# Start środowiska produkcyjnego
+# Start production environment
 make prod-up
 
 # Stop
 make prod-down
 ```
 
-Docker Compose automatycznie:
-1. Utworzy schematy w Supabase Cloud
-2. Uruchomi migracje Prisma
-3. Wystartuje aplikację
+Docker Compose automatically:
+1. Creates schemas in Supabase Cloud
+2. Runs Prisma migrations
+3. Starts the application
 
-Więcej w [iac/docker/docker-compose-prod.yml](iac/docker/docker-compose-prod.yml).
+See [iac/docker/docker-compose-prod.yml](iac/docker/docker-compose-prod.yml) for details.
