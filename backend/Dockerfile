@@ -33,7 +33,8 @@ COPY --from=generate /workspace/libs/core/src/providers/prisma/generated /worksp
 COPY --from=generate /workspace/libs/products/src/infrastructure/prisma/generated /workspace/libs/products/src/infrastructure/prisma/generated
 COPY --from=generate /workspace/libs/identity/src/infrastructure/prisma/generated /workspace/libs/identity/src/infrastructure/prisma/generated
 
-RUN npx nx build app-console --configuration=production
+RUN npx nx build app-console --configuration=production \
+  && npx nx build app-api --configuration=production
 
 FROM node:22-slim AS runtime
 ENV NODE_ENV=production
@@ -59,5 +60,34 @@ RUN mkdir -p /app/logs/app-console \
   && chown -R node:node /app
 
 USER node
+
+CMD ["node", "main.js"]
+
+FROM node:22-slim AS runtime-api
+ENV NODE_ENV=production
+WORKDIR /app
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /workspace/dist/apps/app-api/package.json ./package.json
+COPY --from=build /workspace/dist/apps/app-api/package-lock.json ./package-lock.json
+
+RUN npm ci --omit=dev \
+  && npm cache clean --force
+
+COPY --from=build /workspace/dist/apps/app-api/main.js ./main.js
+COPY --from=build /workspace/apps/app-api/config ./apps/app-api/config
+COPY --from=generate /workspace/libs/core/src/providers/prisma/generated/prisma ./libs/core/src/providers/prisma/generated/prisma
+COPY --from=generate /workspace/libs/products/src/infrastructure/prisma/generated/prisma ./libs/products/src/infrastructure/prisma/generated/prisma
+COPY --from=generate /workspace/libs/identity/src/infrastructure/prisma/generated/prisma ./libs/identity/src/infrastructure/prisma/generated/prisma
+
+RUN mkdir -p /app/logs/app-api \
+  && chown -R node:node /app
+
+USER node
+
+EXPOSE 3000
 
 CMD ["node", "main.js"]

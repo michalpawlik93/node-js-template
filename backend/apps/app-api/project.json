@@ -1,0 +1,89 @@
+{
+  "name": "app-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/app-api/src",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["apps/app-api/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/app-api"],
+      "options": {
+        "jestConfig": "apps/app-api/jest.config.ts",
+        "passWithNoTests": false
+      }
+    },
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/app-api",
+        "format": ["cjs"],
+        "bundle": true,
+        "main": "apps/app-api/src/main.ts",
+        "tsConfig": "apps/app-api/tsconfig.app.json",
+        "assets": ["apps/app-api/.env.*"],
+        "generatePackageJson": true
+      },
+      "configurations": {
+        "development": {
+          "bundle": true,
+          "generateLockfile": true,
+          "esbuildOptions": {
+            "format": "cjs",
+            "platform": "node",
+            "sourcemap": true,
+            "outExtension": {
+              ".js": ".js"
+            },
+            "loader": {
+              ".node": "file"
+            }
+          }
+        },
+        "production": {
+          "bundle": true,
+          "generateLockfile": true,
+          "esbuildOptions": {
+            "sourcemap": false,
+            "minify": true,
+            "treeShaking": true,
+            "format": "cjs",
+            "platform": "node",
+            "outExtension": {
+              ".js": ".js"
+            },
+            "loader": {
+              ".node": "file"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "app-api:build",
+        "runtimeArgs": ["--inspect=9230"],
+        "watch": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "app-api:build:development"
+        },
+        "production": {
+          "buildTarget": "app-api:build:production"
+        }
+      }
+    }
+  },
+  "tags": ["type:app"]
+}

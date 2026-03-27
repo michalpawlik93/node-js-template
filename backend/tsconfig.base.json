@@ -16,6 +16,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@app/app-api": ["apps/app-api/src/main.ts"],
       "@app/app-console": ["apps/app-console/src/main.ts"],
       "@app/identity": ["libs/identity/src/index.ts"],
       "@app/integration-contracts": ["libs/integration-contracts/src/index.ts"],

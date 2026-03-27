@@ -7,8 +7,10 @@
     { "path": "libs/core/tsconfig.spec.json" },
     { "path": "libs/products/tsconfig.lib.json" },
     { "path": "libs/products/tsconfig.spec.json" },
+    { "path": "libs/integration-contracts/tsconfig.lib.json" },
     { "path": "apps/app-console/tsconfig.app.json" },
     { "path": "libs/identity/tsconfig.lib.json" },
     { "path": "libs/identity/tsconfig.spec.json" },
+    { "path": "apps/app-api/tsconfig.app.json" },
   ]
 }

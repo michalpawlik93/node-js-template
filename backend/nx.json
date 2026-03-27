@@ -30,6 +30,7 @@
     "libsDir": "libs"
   },
   "projects": {
+    "app-api": "apps/app-api",
     "app-console": "apps/app-console",
     "identity": "libs/identity",
     "integration-contracts": "libs/integration-contracts",

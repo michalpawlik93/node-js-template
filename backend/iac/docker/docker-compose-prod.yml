@@ -53,3 +53,34 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
+
+  app-api:
+    image: modular-monolith-app-api:latest
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: runtime-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL_CORE: ${DATABASE_URL_CORE}
+      DIRECT_URL_CORE: ${DIRECT_URL_CORE}
+      DATABASE_URL_PRODUCTS: ${DATABASE_URL_PRODUCTS}
+      DIRECT_URL_PRODUCTS: ${DIRECT_URL_PRODUCTS}
+      DATABASE_URL_IDENTITY: ${DATABASE_URL_IDENTITY}
+      DIRECT_URL_IDENTITY: ${DIRECT_URL_IDENTITY}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      CORE_LOG_FILE_PATH: /tmp/core.log
+      PRODUCTS_LOG_FILE_PATH: /tmp/products.log
+      IDENTITY_LOG_FILE_PATH: /tmp/identity.log
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      API_PORT: 3000
+      API_HOST: 0.0.0.0
+      API_CORS_ORIGIN: ${API_CORS_ORIGIN:-*}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully

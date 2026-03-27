@@ -4,6 +4,7 @@ SHELL := powershell.exe
 
 COMPOSE_PROD := docker compose --env-file iac/docker/.env -f iac/docker/docker-compose-prod.yml
 APP_IMAGE ?= modular-monolith-app-console:latest
+APP_API_IMAGE ?= modular-monolith-app-api:latest
 
 POSTGRES_USER ?= postgres
 POSTGRES_PASSWORD ?= postgres
@@ -21,10 +22,10 @@ PRODUCTS_DIRECT_URL := postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POST
 IDENTITY_DB_URL := postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)?schema=identity
 IDENTITY_DIRECT_URL := postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)?schema=identity
 
-.PHONY: help install setup supabase-up supabase-down wait schemas migrate generate migration-create serve test build docker-build prod-up prod-down
+.PHONY: help install setup supabase-up supabase-down wait schemas migrate generate migration-create serve serve-api test build docker-build docker-build-api prod-up prod-down
 
 help:
-	Write-Host 'Available targets:' -ForegroundColor Cyan; Write-Host '  make setup                              Full local setup from scratch'; Write-Host '  make supabase-up / make supabase-down  Start or stop local supabase stack'; Write-Host '  make wait                              Wait for Supabase Postgres on port 54322'; Write-Host '  make schemas                           Create prisma schemas in Supabase Postgres'; Write-Host '  make migrate                           Apply prisma migrations for core, products, and identity'; Write-Host '  make generate                          Generate prisma clients for core, products, and identity'; Write-Host '  make migration-create SCHEMA=... NAME=...  Create a new prisma migration'; Write-Host '  make serve                             Run nx serve app-console'; Write-Host '  make test                              Run workspace tests'; Write-Host '  make build                             Build production artifacts'; Write-Host '  make docker-build                      Build the production docker image'; Write-Host '  make prod-up / make prod-down          Start or stop production docker compose'
+	Write-Host 'Available targets:' -ForegroundColor Cyan; Write-Host '  make setup                              Full local setup from scratch'; Write-Host '  make supabase-up / make supabase-down  Start or stop local supabase stack'; Write-Host '  make wait                              Wait for Supabase Postgres on port 54322'; Write-Host '  make schemas                           Create prisma schemas in Supabase Postgres'; Write-Host '  make migrate                           Apply prisma migrations for core, products, and identity'; Write-Host '  make generate                          Generate prisma clients for core, products, and identity'; Write-Host '  make migration-create SCHEMA=... NAME=...  Create a new prisma migration'; Write-Host '  make serve                             Run nx serve app-console'; Write-Host '  make serve-api                         Run nx serve app-api'; Write-Host '  make test                              Run workspace tests'; Write-Host '  make build                             Build production artifacts (app-console and app-api)'; Write-Host '  make docker-build                      Build the app-console production docker image'; Write-Host '  make docker-build-api                  Build the app-api production docker image'; Write-Host '  make prod-up / make prod-down          Start or stop production docker compose (includes app-api)'
 
 install:
 	npm ci
@@ -61,14 +62,20 @@ migration-create:
 serve:
 	npx nx serve app-console
 
+serve-api:
+	npx nx serve app-api
+
 test:
 	npm test
 
 build:
-	npx nx run-many --target=build --projects=core,products,integration-contracts,identity,app-console
+	npx nx run-many --target=build --projects=core,products,integration-contracts,identity,app-console,app-api
 
 docker-build:
-	docker build -t $(APP_IMAGE) .
+	docker build --target runtime -t $(APP_IMAGE) .
+
+docker-build-api:
+	docker build --target runtime-api -t $(APP_API_IMAGE) .
 
 prod-up:
 	$(COMPOSE_PROD) up -d --build

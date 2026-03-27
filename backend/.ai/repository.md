@@ -7,6 +7,7 @@ Following documents define mandatory standards for all new or changed code:
 - [System design rules](./system-design-rules.md)
 - [Module design rules](./module-design-rule.md)
 - [Testing rules](./testing-rules.md)
+- [API layer rules](./api-layer-rules.md)
 
 **ALWAYS** read these documents for understanding user request.
 
