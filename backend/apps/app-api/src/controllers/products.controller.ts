@@ -42,5 +42,5 @@ export const getPagedProductsController =
     const result = await productFacade.getPagedProducts(request.body, {
       via: IN_MEMORY_TRANSPORT,
     });
-    return mapResultToReply(result, reply);
+    return mapResultToReply(result, reply, 200, (v) => ({ data: v.data, cursor: v.cursor }));
   };

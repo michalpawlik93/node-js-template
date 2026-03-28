@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
+import { useShallow } from 'zustand/react/shallow';
 import { ProductForm } from '@/features/products/components/forms/ProductForm';
 import { ProductsTable } from '@/features/products/components/presentational/ProductsTable';
 import { useProductsStore } from '@/features/products/stores/productsStore';
@@ -18,14 +19,14 @@ import { Loader } from '@/shared/components/presentational/Loader';
 export function ProductsContainer() {
   const { t } = useTranslation();
   const { items, isLoading, error, fetchProducts, createProduct, deleteProduct } = useProductsStore(
-    (state) => ({
+    useShallow((state) => ({
       items: state.items,
       isLoading: state.isLoading,
       error: state.error,
       fetchProducts: state.fetchProducts,
       createProduct: state.createProduct,
       deleteProduct: state.deleteProduct,
-    }),
+    })),
   );
 
   const { control, handleSubmit, reset, formState } = useForm<

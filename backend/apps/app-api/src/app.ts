@@ -12,6 +12,7 @@ import { healthRoutes } from './routes/health.routes';
 import { identityRoutes } from './routes/identity.routes';
 import { productsRoutes } from './routes/products.routes';
 import type { ApiConfig } from './config';
+import { getEnvironment, resolveLogLevel } from './config';
 import './types';
 
 export interface BuildAppDeps {
@@ -26,8 +27,22 @@ export async function buildApp({
   config,
   facades,
 }: BuildAppDeps): Promise<FastifyInstance> {
+  const isDevelopment = getEnvironment() !== 'production';
+  const logLevel = resolveLogLevel(process.env.LOG_LEVEL) ?? 'info';
+
   const app = Fastify({
-    logger: true,
+    logger: {
+      level: logLevel,
+      transport: isDevelopment
+        ? {
+            target: 'pino-pretty',
+            options: {
+              translateTime: 'SYS:standard',
+              colorize: true,
+            },
+          }
+        : undefined,
+    },
   });
 
   registerErrorHandler(app);
